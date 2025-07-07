@@ -50,7 +50,26 @@ struct ContentView: View {
                     .animation(.easeOut(duration: 0.7).delay(2), value: animateViewsIn)
                     
                     Spacer()
-                    Spacer()
+                    
+                    VStack {
+                        if animateViewsIn {
+                            VStack {
+                                Text("Recent Scores")
+                                    .font(.title2)
+                                Text("32")
+                                Text("28")
+                                Text("18")
+                            }
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                            .padding()
+                            .background(.black.opacity(0.7))
+                            .clipShape(.rect(cornerRadius: 15))
+                            .transition(.opacity)
+                        }
+                    }
+                    .animation(.linear(duration: 1).delay(4), value: animateViewsIn)
+                    
                     Spacer()
                     
                     HStack {

@@ -12,83 +12,27 @@ struct ContentView: View {
     @State private var animateViewsIn = false
     @State private var audioPlayer: AVAudioPlayer!
     @State private var scalePlayButton: Bool = false
-    @State private var showInstructions: Bool = false
     @State private var showShowSettings: Bool = false
     @State private var playGame: Bool = false
     
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                Image(.hogwarts)
-                    .resizable()
-                    .frame(width: geo.size.width * 3, height: geo.size.height)
-                    .padding(.top, 3)
-                    .phaseAnimator([false, true]) { content, phase in
-                        content
-                            .offset(x: phase ? geo.size.width / 1.1 : -geo.size.width / 1.1)
-                    } animation: { _ in
-                            .linear(duration: 60)
-                    }
+                AnimatedBackground(geo: geo)
 
                 VStack {
-                    VStack {
-                        if animateViewsIn {
-                            VStack {
-                                Image(systemName: "bolt.fill")
-                                    .imageScale(.large)
-                                    .font(.largeTitle)
-                                Text("HP")
-                                    .font(.custom("PartyLetPlain", size: 70))
-                                    .padding(.bottom, -50)
-                                Text("Trivia")
-                                    .font(.custom("PartyLetPlain", size: 60))
-                            }
-                            .padding(.top, 70)
-                            .transition(.move(edge: .top))
-                        }
-                    }
-                    .animation(.easeOut(duration: 0.7).delay(2), value: animateViewsIn)
+                    GameTemplate(animateViewsIn: $animateViewsIn)
                     
                     Spacer()
                     
-                    VStack {
-                        if animateViewsIn {
-                            VStack {
-                                Text("Recent Scores")
-                                    .font(.title2)
-                                Text("32")
-                                Text("28")
-                                Text("18")
-                            }
-                            .font(.title3)
-                            .foregroundStyle(.white)
-                            .padding()
-                            .background(.black.opacity(0.7))
-                            .clipShape(.rect(cornerRadius: 15))
-                            .transition(.opacity)
-                        }
-                    }
-                    .animation(.linear(duration: 1).delay(4), value: animateViewsIn)
+                    RecentScores(animateViewsIn: $animateViewsIn)
                     
                     Spacer()
                     
                     HStack {
                         Spacer()
                         
-                        VStack {
-                            if animateViewsIn {
-                                Button {
-                                    showInstructions.toggle()
-                                } label: {
-                                    Image(systemName: "info.circle.fill")
-                                        .font(.largeTitle)
-                                        .foregroundStyle(.white)
-                                        .shadow(radius: 5)
-                                }
-                                .transition(.offset(x: -geo.size.width / 4))
-                            }
-                        }
-                        .animation(.easeOut(duration: 0.7).delay(2.7), value: animateViewsIn)
+                        InstructionsButton(animateViewsIn: $animateViewsIn, geo: geo)
 
                         Spacer()
                         
@@ -147,9 +91,6 @@ struct ContentView: View {
         .onAppear {
             animateViewsIn = true
 //            playAudio()
-        }
-        .sheet(isPresented: $showInstructions) {
-            Instructions()
         }
     }
     

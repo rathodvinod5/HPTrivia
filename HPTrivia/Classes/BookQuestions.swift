@@ -1,0 +1,53 @@
+//
+//  BookQuestions.swift
+//  HPTrivia
+//
+//  Created by Vinod Rathod on 11/07/25.
+//
+import Foundation
+
+@Observable
+class BookQuestions {
+    var books: [Book] = []
+    
+    init() {
+        let decodedQuestions = decodeQuestions()
+        let organizedQustions = organizeQuestions(decodedQuestions)
+        populateBooks(with: organizedQustions)
+    }
+    
+    private func decodeQuestions() -> [Question] {
+        var decodedQuestions: [Question] = []
+        
+        if let url = Bundle.main.url(forResource: "trivia", withExtension: "json") {
+            do {
+                let data = try Data(contentsOf: url)
+                decodedQuestions = try JSONDecoder().decode([Question].self, from: data)
+            } catch {
+                print("Error decoding json data: \(error)")
+            }
+        }
+        
+        return decodedQuestions
+    }
+    
+    private func organizeQuestions(_ questions: [Question]) -> [[Question]] {
+        var organizedQuestions: [[Question]] = [[], [], [], [], [], [], [], []]
+        
+        for question in questions {
+            organizedQuestions[question.book].append(question)
+        }
+        
+        return organizedQuestions
+    }
+    
+    private func populateBooks(with questions: [[Question]]) {
+        books.append(Book(id: 1, image: "hp1", questions: questions[1], satus: .active))
+        books.append(Book(id: 2, image: "hp2", questions: questions[2], satus: .active))
+        books.append(Book(id: 3, image: "hp3", questions: questions[3], satus: .inactive))
+        books.append(Book(id: 4, image: "hp4", questions: questions[4], satus: .locked))
+        books.append(Book(id: 5, image: "hp5", questions: questions[5], satus: .locked))
+        books.append(Book(id: 6, image: "hp6", questions: questions[6], satus: .locked))
+        books.append(Book(id: 7, image: "hp7", questions: questions[7], satus: .locked))
+    }
+}

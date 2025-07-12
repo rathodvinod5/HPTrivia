@@ -9,7 +9,7 @@ struct Book : Identifiable {
     let id: Int
     let image: String
     let questions: [Question]
-    let satus: BookStatus
+    let status: BookStatus
     
     enum BookStatus {
         case active, inactive, locked

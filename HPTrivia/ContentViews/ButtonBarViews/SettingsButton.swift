@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SettingsButton: View {
-    @State var showShowSettings: Bool = false
+    @State var showSettings: Bool = false
     
     @Binding var animateViewsIn: Bool
     
@@ -18,7 +18,7 @@ struct SettingsButton: View {
         VStack {
             if animateViewsIn {
                 Button {
-                    showShowSettings.toggle()
+                    showSettings.toggle()
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.largeTitle)
@@ -29,11 +29,15 @@ struct SettingsButton: View {
             }
         }
         .animation(.easeOut(duration: 0.7).delay(2.7), value: animateViewsIn)
+        .sheet(isPresented: $showSettings) {
+            SelectBooks()
+        }
     }
 }
 
 #Preview {
     GeometryReader { geo in
         SettingsButton(animateViewsIn: .constant(true), geo: geo)
+            .environment(Game())
     }
 }

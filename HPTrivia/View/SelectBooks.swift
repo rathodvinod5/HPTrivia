@@ -10,6 +10,8 @@ import SwiftUI
 struct SelectBooks: View {
     @Environment(\.dismiss) var dismiss
     @Environment(Game.self) private var game
+    
+    @State var showTempAlert: Bool = false
 
     var body: some View {
         ZStack {
@@ -40,12 +42,27 @@ struct SelectBooks: View {
                                         .shadow(radius: 2)
                                         .padding(3)
                                 }
+                                .onTapGesture {
+                                    game.bookQuestions.changeStatus(for: book.id, status: .inactive)
+                                }
                             } else if book.status == .inactive {
-                                ZStack{
+                                ZStack(alignment: .bottomTrailing) {
                                     Image(book.image)
                                         .resizable()
                                         .scaledToFit()
                                         .shadow(radius: 7)
+                                        .overlay {
+                                            Rectangle().opacity(0.33)
+                                        }
+                                    
+                                    Image(systemName: "circle")
+                                        .font(.largeTitle)
+                                        .foregroundStyle(.green)
+                                        .shadow(radius: 2)
+                                        .padding(3)
+                                }
+                                .onTapGesture {
+                                    game.bookQuestions.changeStatus(for: book.id, status: .active)
                                 }
                             } else {
                                 ZStack{
@@ -53,6 +70,18 @@ struct SelectBooks: View {
                                         .resizable()
                                         .scaledToFit()
                                         .shadow(radius: 7)
+                                        .overlay {
+                                            Rectangle().opacity(0.75)
+                                        }
+                                    
+                                    Image(systemName: "lock.fill")
+                                        .font(.largeTitle)
+                                        .imageScale(.large)
+                                        .shadow(color: .white, radius: 5)
+                                }
+                                .onTapGesture {
+                                    showTempAlert.toggle()
+                                    game.bookQuestions.changeStatus(for: book.id, status: .active)
                                 }
                             }
                         }
@@ -69,6 +98,9 @@ struct SelectBooks: View {
                 .tint(.brown.mix(with: .black, by: 0.2))
                 .foregroundStyle(.white)
             }
+        }
+        .alert("You purchased a new set of questions!", isPresented: $showTempAlert) {
+            
         }
     }
 }

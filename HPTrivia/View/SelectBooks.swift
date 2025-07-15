@@ -10,6 +10,18 @@ import SwiftUI
 struct SelectBooks: View {
     @Environment(\.dismiss) var dismiss
     @Environment(Game.self) private var game
+    
+    @State var showTempAlert: Bool = false
+    
+    var activeBooks: Bool {
+        for book in game.bookQuestions.books {
+            if book.status == .active {
+                return true
+            }
+        }
+        
+        return false
+    }
 
     var body: some View {
         ZStack {
@@ -28,36 +40,32 @@ struct SelectBooks: View {
                     LazyVGrid(columns: [GridItem(), GridItem()]) {
                         ForEach(game.bookQuestions.books) { book in
                             if book.status == .active {
-                                ZStack(alignment: .bottomTrailing) {
-                                    Image(book.image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .shadow(radius: 7)
-                                    
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .font(.largeTitle)
-                                        .foregroundStyle(.green)
-                                        .shadow(radius: 2)
-                                        .padding(3)
-                                }
+                                ActiveBook(book: book)
+                                    .onTapGesture {
+                                        game.bookQuestions.changeStatus(for: book.id, to: .inactive)
+                                    }
+                                
                             } else if book.status == .inactive {
-                                ZStack{
-                                    Image(book.image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .shadow(radius: 7)
-                                }
+                                InactiveBook(book: book)
+                                    .onTapGesture {
+                                        game.bookQuestions.changeStatus(for: book.id, to: .active)
+                                    }
+                                
                             } else {
-                                ZStack{
-                                    Image(book.image)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .shadow(radius: 7)
-                                }
+                                LockedBook(book: book)
+                                    .onTapGesture {
+                                        showTempAlert.toggle()
+                                        game.bookQuestions.changeStatus(for: book.id, to: .active)
+                                    }
                             }
                         }
                     }
                     .padding()
+                }
+                
+                if !activeBooks {
+                    Text("You must selected atleast one book!")
+                        .multilineTextAlignment(.center)
                 }
                 
                 Button("Done") {
@@ -68,7 +76,12 @@ struct SelectBooks: View {
                 .buttonStyle(.borderedProminent)
                 .tint(.brown.mix(with: .black, by: 0.2))
                 .foregroundStyle(.white)
+                .disabled(!activeBooks)
             }
+        }
+        .interactiveDismissDisabled(!activeBooks)
+        .alert("You purchased a new set of questions!", isPresented: $showTempAlert) {
+            
         }
     }
 }

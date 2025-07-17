@@ -5,7 +5,7 @@
 //  Created by Vinod Rathod on 11/07/25.
 //
 
-struct Book : Identifiable {
+struct Book: Identifiable {
     let id: Int
     let image: String
     let questions: [Question]

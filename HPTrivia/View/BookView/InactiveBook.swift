@@ -17,7 +17,7 @@ struct InactiveBook: View {
                 .scaledToFit()
                 .shadow(radius: 7)
             
-            Image(systemName: "checkmark.circle.fill")
+            Image(systemName: "circle")
                 .font(.largeTitle)
                 .foregroundStyle(.green)
                 .shadow(radius: 2)

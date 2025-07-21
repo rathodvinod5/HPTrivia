@@ -14,6 +14,7 @@ struct Gameplay: View {
     
     @State private var musicPlayer : AVAudioPlayer!
     @State private var sfxPlayer : AVAudioPlayer!
+    @State private var animateViewsIn : Bool = false
     
     var body: some View {
         GeometryReader { geo in
@@ -29,6 +30,34 @@ struct Gameplay: View {
                 
                 VStack {
                     // MARK: Controls
+                    HStack {
+                        Button("End game") {
+                            game.endGame()
+                            dismiss()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red.opacity(0.5))
+                        
+                        Spacer()
+                        
+                        Text("Score: \(game.gameScore)")
+                    }
+                    .padding()
+                    .padding(.vertical, 30)
+                    
+                    VStack {
+                        if animateViewsIn {
+                            Text(game.currentQuestion.question)
+                                .font(.custom("PartyLetPlain", size: 50))
+                                .multilineTextAlignment(.center)
+                                .padding()
+                                .transition(.scale)
+                        }
+                    }
+                    .animation(.easeIn(duration: 2), value: animateViewsIn)
+                    
+                    Spacer()
+                    
                     
                     // MARK: Question
                     
@@ -36,7 +65,9 @@ struct Gameplay: View {
                     
                     // MARK: answers
                 }
-                .frame(width: geo.size.width * 3, height: geo.size.height * 1.05)
+                .frame(width: geo.size.width, height: geo.size.height)
+                .foregroundStyle(.white)
+                
                 
                 // MARK: Celebrations
             }
@@ -45,6 +76,10 @@ struct Gameplay: View {
         .ignoresSafeArea()
         .onAppear {
             game.startGame()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                animateViewsIn.toggle()
+            }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
 //                playMusic()

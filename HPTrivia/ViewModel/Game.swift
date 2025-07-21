@@ -17,9 +17,22 @@ class Game {
     
     var activeQuestions: [Question] = []
     var answeredQuestions: [Int] = []
-    var currentQuestion = try! JSONDecoder().decode([Question].self, from:
-        Data(contentsOf: Bundle.main.url(forResource: "book_questions", withExtension: "json")!))[0]
+//    var currentQuestion = try! JSONDecoder().decode([Question].self, from:
+//        Data(contentsOf: Bundle.main.url(forResource: "book_questions", withExtension: "json")!))[0]
     var answers: [String] = []
+    
+    var currentQuestion: Question = Question(id: 0, question: "", answer: "", wrong: [], book: 0, hint: "") // Placeholder
+    
+    init() {
+        if let url = Bundle.main.url(forResource: "book_questions", withExtension: "json"),
+           let data = try? Data(contentsOf: url),
+           let questions = try? JSONDecoder().decode([Question].self, from: data),
+           !questions.isEmpty {
+            currentQuestion = questions[0]
+        } else {
+            print("❌ Failed to load or decode book_questions.json")
+        }
+    }
     
     func startGame() {
         for book in bookQuestions.books {

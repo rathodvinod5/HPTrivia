@@ -16,6 +16,8 @@ struct Gameplay: View {
     @State private var sfxPlayer: AVAudioPlayer!
     @State private var animateViewsIn: Bool = false
     @State private var revealHint: Bool = false
+    @State private var revealBook: Bool = false
+    @State private var tappedCorrectAnswer: Bool = false
     
     var body: some View {
         GeometryReader { geo in
@@ -102,10 +104,101 @@ struct Gameplay: View {
                         .animation(.easeOut(duration: 1.5).delay(2), value: animateViewsIn)
                         
                         Spacer()
+                        
+                        VStack {
+                            if animateViewsIn {
+                                Image(systemName: "app.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100)
+                                    .foregroundStyle(.cyan)
+                                    .overlay(content: {
+                                        Image(systemName: "book.closed")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 50)
+                                            .foregroundStyle(.black)
+                                    })
+                                    .padding()
+                                    .transition(.offset(x: geo.size.width / 2))
+                                    .phaseAnimator([false, true]) { content, phase in
+                                        content
+                                            .rotationEffect(.degrees(phase ? 13 : 17))
+                                    } animation: { _ in
+                                            .easeInOut(duration: 0.7)
+                                    }
+                                    .onTapGesture {
+                                        withAnimation(.easeInOut(duration: 1)) {
+                                            revealBook = true
+                                        }
+                                        
+                                        playFlipSound()
+                                        game.gameScore -= 1
+                                    }
+                                    .rotation3DEffect(.degrees(revealBook ? -1440 : 0), axis: (x: 0, y: 1, z: 0))
+                                    .scaleEffect(revealBook ? 5 : 1)
+                                    .offset(x: revealBook ? -geo.size.width/2 : 0)
+                                    .opacity(revealBook ? 0 : 1)
+                                    .overlay {
+                                        Image("hp\(game.currentQuestion.book)")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(.trailing, 20)
+                                            .opacity(revealBook ? 1 : 0)
+                                            .scaleEffect(revealBook ? 1.33 : 1)
+                                    }
+                            }
+                        }
+                        .animation(.easeOut(duration: 1.5).delay(2), value: animateViewsIn)
                     }
                     .padding()
                     
-                    // MARK: answers
+                    // MARK: Answers
+                    LazyVGrid(columns: [GridItem(), GridItem()]) {
+                        ForEach(game.answers, id: \.self) { answer in
+                            if answer == game.currentQuestion.answer {
+                                // MARK: Correct answer
+                                VStack {
+                                    if animateViewsIn {
+                                        Button {
+                                            tappedCorrectAnswer = true
+                                            playCorrectSound()
+                                            game.correct()
+                                        } label: {
+                                            Text(answer)
+                                                .minimumScaleFactor(0.5)
+                                                .multilineTextAlignment(.center)
+                                                .padding()
+                                                .frame(width: geo.size.width/2.15, height: 80)
+                                                .background(.green.opacity(0.5))
+                                                .cornerRadius(20)
+                                        }
+                                    }
+                                }
+                                .animation(.easeOut(duration: 1).delay(1.5), value: animateViewsIn)
+                            } else {
+                                // MARK: Wrong answer
+                                VStack {
+                                    if animateViewsIn {
+                                        Button {
+                                            playWrongSound()
+                                            game.gameScore -= 1
+                                        } label: {
+                                            Text(answer)
+                                                .minimumScaleFactor(0.5)
+                                                .multilineTextAlignment(.center)
+                                                .padding()
+                                                .frame(width: geo.size.width/2.15, height: 80)
+                                                .background(.green.opacity(0.5))
+                                                .cornerRadius(20)
+                                        }
+                                    }
+                                }
+                                .animation(.easeOut(duration: 1).delay(1.5), value: animateViewsIn)
+                            }
+                        }
+                    }
+                    
                     Spacer()
                 }
                 .frame(width: geo.size.width, height: geo.size.height)

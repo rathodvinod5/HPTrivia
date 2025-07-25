@@ -228,6 +228,8 @@ struct Gameplay: View {
                 
                 // MARK: Celebrations
                 VStack {
+                    Spacer()
+                    
                     VStack {
                         if tappedCorrectAnswer {
                             Text("\(game.questionScore)")
@@ -239,6 +241,8 @@ struct Gameplay: View {
                     }
                     .animation(.easeInOut(duration: 1).delay(2), value: tappedCorrectAnswer)
                     
+                    Spacer()
+                    
                     VStack {
                         if tappedCorrectAnswer {
                             Text("Brilliant")
@@ -248,6 +252,8 @@ struct Gameplay: View {
                         }
                     }
                     .animation(.easeInOut(duration: 1).delay(1), value: tappedCorrectAnswer)
+                    
+                    Spacer()
                     
                     if tappedCorrectAnswer {
                         Text(game.currentQuestion.answer)
@@ -260,6 +266,25 @@ struct Gameplay: View {
                             .scaleEffect(2)
                             .matchedGeometryEffect(id: 1, in: namespace)
                     }
+                    
+                    Spacer()
+                    Spacer()
+                    
+                    VStack {
+                        if tappedCorrectAnswer {
+                            Button("Next Level >") {
+                                
+                            }
+                                .font(.largeTitle)
+                                .foregroundStyle(.white)
+                                .buttonStyle(.borderedProminent)
+                                .tint(.blue.opacity(0.5))
+                        }
+                    }
+                    .animation(.easeInOut(duration: 2).delay(2.7), value: tappedCorrectAnswer)
+                    
+                    Spacer()
+                    Spacer()
                 }
             }
             .frame(width: geo.size.width, height: geo.size.height)

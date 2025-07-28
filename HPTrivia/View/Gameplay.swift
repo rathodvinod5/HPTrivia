@@ -15,6 +15,7 @@ struct Gameplay: View {
     
     @State private var musicPlayer: AVAudioPlayer!
     @State private var sfxPlayer: AVAudioPlayer!
+    
     @State private var animateViewsIn: Bool = false
     @State private var revealHint: Bool = false
     @State private var revealBook: Bool = false
@@ -62,7 +63,7 @@ struct Gameplay: View {
                                     .transition(.scale)
                             }
                         }
-                        .animation(.easeIn(duration: 2), value: animateViewsIn)
+                        .animation(.easeIn(duration: animateViewsIn ? 2 : 0), value: animateViewsIn)
                         
                         Spacer()
                         
@@ -105,7 +106,8 @@ struct Gameplay: View {
                                         }
                                 }
                             }
-                            .animation(.easeOut(duration: 1.5).delay(2), value: animateViewsIn)
+                            .animation(.easeOut(duration: animateViewsIn ? 1.5 : 0)
+                                .delay(animateViewsIn ? 2 : 0), value: animateViewsIn)
                             
                             Spacer()
                             
@@ -153,7 +155,8 @@ struct Gameplay: View {
                                         }
                                 }
                             }
-                            .animation(.easeOut(duration: 1.5).delay(2), value: animateViewsIn)
+                            .animation(.easeOut(duration: animateViewsIn ? 1.5 : 0)
+                                .delay(animateViewsIn ? 2 : 0), value: animateViewsIn)
                         }
                         .padding()
                         
@@ -189,7 +192,8 @@ struct Gameplay: View {
                                             }
                                         }
                                     }
-                                    .animation(.easeOut(duration: 1).delay(1.5), value: animateViewsIn)
+                                    .animation(.easeOut(duration: animateViewsIn ? 1 : 0)
+                                        .delay(animateViewsIn ? 1.5 : 0), value: animateViewsIn)
                                 } else {
                                     // MARK: Wrong answer
                                     VStack {
@@ -217,7 +221,8 @@ struct Gameplay: View {
                                             .disabled(wrongAnswersTapped.contains(answer))
                                         }
                                     }
-                                    .animation(.easeOut(duration: 1).delay(1.5), value: animateViewsIn)
+                                    .animation(.easeOut(duration: animateViewsIn ? 1 : 0)
+                                        .delay(animateViewsIn ? 1.5 : 0), value: animateViewsIn)
                                 }
                             }
                         }
@@ -264,7 +269,8 @@ struct Gameplay: View {
                                 .transition(.scale.combined(with: .offset(y: -geo.size.height / 2)))
                         }
                     }
-                    .animation(.easeInOut(duration: 1).delay(1), value: tappedCorrectAnswer)
+                    .animation(.easeInOut(duration: tappedCorrectAnswer ? 1 : 0)
+                        .delay(tappedCorrectAnswer ? 1 : 0), value: tappedCorrectAnswer)
                     
                     Spacer()
                     
@@ -286,7 +292,17 @@ struct Gameplay: View {
                     VStack {
                         if tappedCorrectAnswer {
                             Button("Next Level >") {
+                                animateViewsIn = false
+                                revealHint = false
+                                revealBook = false
+                                tappedCorrectAnswer = false
+                                wrongAnswersTapped = []
+                                movePointsToScore = false
                                 
+                                game.newQuestion()
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    animateViewsIn = true
+                                }
                             }
                                 .font(.largeTitle)
                                 .foregroundStyle(.white)
@@ -294,7 +310,8 @@ struct Gameplay: View {
                                 .tint(.blue.opacity(0.5))
                         }
                     }
-                    .animation(.easeInOut(duration: 2).delay(2.7), value: tappedCorrectAnswer)
+                    .animation(.easeInOut(duration: tappedCorrectAnswer ? 2 : 0)
+                        .delay(tappedCorrectAnswer ? 2.7 : 0), value: tappedCorrectAnswer)
                     .phaseAnimator([false, true]) { content, phase in
                         content
                             .scaleEffect(phase ? 1.2 : 1)

@@ -23,6 +23,8 @@ class Game {
     
     var currentQuestion: Question = Question(id: 0, question: "", answer: "", wrong: [], book: 0, hint: "") // Placeholder
     
+    let savePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "RecentScore")
+    
     init() {
         if let url = Bundle.main.url(forResource: "book_questions", withExtension: "json"),
            let data = try? Data(contentsOf: url),
@@ -32,6 +34,7 @@ class Game {
         } else {
             print("❌ Failed to load or decode book_questions.json")
         }
+        loadScore()
     }
     
     func startGame() {
@@ -79,9 +82,28 @@ class Game {
         recentScores[2] = recentScores[1]
         recentScores[1] = recentScores[0]
         recentScores[0] = gameScore
+        saveScore()
         
         gameScore = 0
         activeQuestions = []
         answeredQuestions = []
+    }
+    
+    func saveScore() {
+        do {
+            let data = try JSONEncoder().encode(recentScores)
+            try data.write(to: savePath)
+        } catch {
+            print("Failed to save score: \(error)")
+        }
+    }
+    
+    func loadScore() {
+        do {
+            let data = try Data(contentsOf: savePath)
+            recentScores = try JSONDecoder().decode([Int].self, from: data)
+        } catch {
+            print("Failed to load score: \(error)")
+        }
     }
 }

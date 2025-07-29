@@ -27,6 +27,38 @@ class Store {
     }
     
     // Purchase a product
+    func purchase(_ product: Product) async {
+        do {
+            let result = try await product.purchase()
+            
+            switch result {
+            case .success(let verificationResult):
+                switch verificationResult {
+                case .verified(let signedType):
+                    purchased.insert(signedType.productID)
+                    await signedType.finish()
+                    
+                case .unverified(let signedType, let verificationError):
+                    print("Error on \(signedType): \(verificationError)")
+                    
+                @unknown default:
+                    break
+                }
+                
+            case .userCancelled:
+                break
+                
+            case .pending:
+                break
+                
+            @unknown default:
+                break
+            }
+            
+        } catch {
+            print("Unable to purchase product: \(error)")
+        }
+    }
     
     // Check for purchased products
     

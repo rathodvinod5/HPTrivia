@@ -11,7 +11,6 @@ struct SelectBooks: View {
     @Environment(\.dismiss) var dismiss
     @Environment(Game.self) private var game
     
-    @State var showTempAlert: Bool = false
     @State private var store = Store()
     
     var activeBooks: Bool {
@@ -40,8 +39,11 @@ struct SelectBooks: View {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(), GridItem()]) {
                         ForEach(game.bookQuestions.books) { book in
-                            if book.status == .active {
+                            if book.status == .active || (book.status == .locked && store.purchased.contains(book.image)) {
                                 ActiveBook(book: book)
+                                    .task {
+                                        game.bookQuestions.changeStatus(for: book.id, to: .active)
+                                    }
                                     .onTapGesture {
                                         game.bookQuestions.changeStatus(for: book.id, to: .inactive)
                                     }
@@ -55,8 +57,11 @@ struct SelectBooks: View {
                             } else {
                                 LockedBook(book: book)
                                     .onTapGesture {
-                                        showTempAlert.toggle()
-                                        game.bookQuestions.changeStatus(for: book.id, to: .active)
+                                        let product = store.products[book.id-4]
+                                        
+                                        Task {
+                                            await store.purchase(product)
+                                        }
                                     }
                             }
                         }
@@ -70,6 +75,7 @@ struct SelectBooks: View {
                 }
                 
                 Button("Done") {
+                    game.bookQuestions.saveStatus()
                     dismiss()
                 }
                 .font(.largeTitle)
@@ -80,10 +86,7 @@ struct SelectBooks: View {
                 .disabled(!activeBooks)
             }
         }
-        .interactiveDismissDisabled(!activeBooks)
-        .alert("You purchased a new set of questions!", isPresented: $showTempAlert) {
-            
-        }
+        .interactiveDismissDisabled()
         .task {
             await store.loadProducts()
         }

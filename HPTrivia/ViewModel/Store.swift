@@ -14,7 +14,7 @@ class Store {
     
     private var updates: Task<Void, Never>? = nil
     
-    init() async {
+    init() {
         updates = watchForUpdates()
     }
     
@@ -88,7 +88,11 @@ class Store {
     
     // Connect with app store to watch for purchase and transaction updates
     func watchForUpdates() -> Task<Void, Never> {
-        
+        Task(priority: .background) {
+            for await _ in Transaction.updates {
+                await checkPurchaseStatus()
+            }
+        }
     }
     
 }
